@@ -1,5 +1,5 @@
 import React from 'react';
-import { type Question } from '../types';
+import { Question } from '../types';
 
 interface QuizProps {
   questions: Question[];
@@ -9,57 +9,79 @@ interface QuizProps {
 }
 
 const Quiz: React.FC<QuizProps> = ({ questions, answers, onAnswerChange, onSubmit }) => {
-  const allAnswered = Object.keys(answers).length === questions.length;
+  const progress = (Object.keys(answers).length / questions.length) * 100;
 
   return (
-    <>
-      <p className="text-center text-slate-600 mb-8">Responda as questões abaixo escolhendo a que mais se parece com você.</p>
+    <div>
+      {/* Progress Bar */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-medium text-gray-600">Progresso</span>
+          <span className="text-sm font-medium text-gray-600">
+            {Object.keys(answers).length} / {questions.length}
+          </span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-3">
+          <div
+            className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Questions */}
       <div className="space-y-8">
-        {questions.map((question, index) => (
-          <div key={question.id} className="border-b border-slate-200 pb-8 last:border-b-0 last:pb-0">
-            <p className="text-lg font-semibold text-slate-700 mb-4">
-              {`${index + 1}. ${question.text}`}
-            </p>
+        {questions.map((question) => (
+          <div key={question.id} className="border-b border-gray-200 pb-8 last:border-0">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              {question.id}. {question.text}
+            </h3>
             <div className="space-y-3">
-              {Object.entries(question.options).map(([key, value]) => {
-                const isSelected = answers[question.id] === key;
-                return (
-                  <label
-                    key={key}
-                    className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                      isSelected
-                        ? 'bg-sky-50 border-sky-500 shadow-sm'
-                        : 'bg-white border-slate-300 hover:border-sky-400'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name={`question-${question.id}`}
-                      value={key}
-                      checked={isSelected}
-                      onChange={() => onAnswerChange(question.id, key)}
-                      className="h-4 w-4 text-sky-600 border-slate-300 focus:ring-sky-500"
-                    />
-                    <span className={`ml-3 text-base ${isSelected ? 'font-semibold text-sky-800' : 'text-slate-700'}`}>
-                      {value}
-                    </span>
-                  </label>
-                );
-              })}
+              {Object.entries(question.options).map(([key, value]) => (
+                <label
+                  key={key}
+                  className={`flex items-start p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                    answers[question.id] === key
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name={`question-${question.id}`}
+                    value={key}
+                    checked={answers[question.id] === key}
+                    onChange={() => onAnswerChange(question.id, key)}
+                    className="mt-1 mr-3"
+                  />
+                  <span className="text-gray-700">{value}</span>
+                </label>
+              ))}
             </div>
           </div>
         ))}
-        <div className="pt-6 flex justify-end">
-          <button
-            onClick={onSubmit}
-            disabled={!allAnswered}
-            className="px-8 py-3 bg-sky-600 text-white font-bold rounded-lg shadow-md hover:bg-sky-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
-          >
-            Ver Resultado
-          </button>
-        </div>
       </div>
-    </>
+
+      {/* Submit Button */}
+      <div className="mt-8 text-center">
+        <button
+          onClick={onSubmit}
+          disabled={Object.keys(answers).length !== questions.length}
+          className={`px-8 py-3 rounded-lg font-semibold transition-all ${
+            Object.keys(answers).length === questions.length
+              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
+        >
+          Ver Resultados
+        </button>
+        {Object.keys(answers).length !== questions.length && (
+          <p className="text-sm text-gray-500 mt-2">
+            Responda todas as questões para ver seus resultados
+          </p>
+        )}
+      </div>
+    </div>
   );
 };
 
