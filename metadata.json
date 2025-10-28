@@ -1,0 +1,5 @@
+{
+  "name": "Teste de Perfil Comportamental",
+  "description": "Uma aplicação web interativa para realizar um teste de perfil comportamental e visualizar os resultados de Dominância, Influência, Estabilidade e Conformidade.",
+  "requestFramePermissions": []
+}
